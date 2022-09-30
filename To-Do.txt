@@ -1,0 +1,18 @@
+1) setup server (express, listening etc.)
+2) html templates (handlebars), html for the 3 routes (mainPage / Thanks / Signatures)
+2,5) CSS for the 3 routes
+3) create Database
+
+3) logic for the requests (GET / POST)
+4) Cookie if already signed
+5) writing the three functions needed (sendSignature / getSignature / countSignature)
+6) connecting everything
+
+7) adjusting the JS/HTML to show what was done in the steps before
+8) trying out the canvas signature part
+9) 
+
+
+
+Friday:
+- setting up the folders & requiring everything needed
