@@ -1,5 +1,7 @@
 const db = require("./db");
-const { getAllSignatures } = require("./db")
+const { getAllSignatures } = require("./db");
+const { createSignature } = require("./db");
+const { countSignatures } = require("./db");
 
 const chalk = require("chalk");
 const path = require("path");
@@ -35,10 +37,13 @@ app.get("/main", (req, res) => {
     // to see the content of the signatures table in the petition database:
     // getAllSignatures().then((result) => console.log(result));
 
-    res.render("mainPage", {
-        title: "Main Page"
-    });
-
+    if (!req.cookies.alreadySigned) {
+        res.render("mainPage", {
+        title: "Main Page",
+    })
+    } else {
+        res.redirect("/thankyou");
+    }
 
     // if user has NOT signed:
     //    render the petition page with the form
@@ -48,10 +53,17 @@ app.get("/main", (req, res) => {
 
 app.post("/main", (req, res) => {
 
+    // console.log("this is the request body: ", req.body);
 
-      res.render("thankyou", {
-          title: "Thanks for your vote!",
-      });
+    const a = req.body.firstname;
+    const b = req.body.lastname;
+    const c = req.body.signature;
+
+    createSignature(a, b, c);
+
+    res.cookie("alreadySigned", true);    
+
+    res.redirect("/thankyou");
     // check input: first, last names, signature
     // if they are VALID:
     //     STORE in database
@@ -62,6 +74,21 @@ app.post("/main", (req, res) => {
 });
 
 app.get("/thankyou", (req, res) => {
+
+    countSignatures().then((result) => console.log(result));
+
+    if (req.cookies.alreadySigned) {
+
+        res.render("thankyou", {
+            title: "Thanks for your vote!",
+            signatures: 5,
+        });
+
+    } else {
+
+        res.redirect("/main");
+
+    }
     // if user has signed:
     //     Get data from db
     //     Show info: thank you for signing + how many people have signed
@@ -70,6 +97,14 @@ app.get("/thankyou", (req, res) => {
 });
 
 app.get("/signatures", (req, res) => {
+
+    if (req.cookies.alreadySigned) {
+        res.render("signatures", {
+            title: "Supporters",
+        });
+    } else {
+        res.redirect("/main");
+    }
     // if user has signed:
     //     Get data from db
     //     Show info: all previous signatures

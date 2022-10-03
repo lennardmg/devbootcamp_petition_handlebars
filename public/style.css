@@ -15,6 +15,11 @@ form {
     margin: 50px auto;
 }
 
+.error {
+    color: red;
+    margin: 0;
+}
+
 .user-data {
     color: white;
     font-family: Helvetica, Arial, sans-serif;

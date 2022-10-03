@@ -34,5 +34,20 @@ module.exports.createSignature = function (firstname, lastname, canvassignature)
         .catch((error) => console.log("error in createSignature function", error));
 };
 
+module.exports.countSignatures = function () {
+    const sql = "SELECT COUNT(*) FROM signatures;";
+    return db
+        .query(sql)
+        .then((result) => {
+            return result.rows;
+        })
+        .catch((error) => {
+            console.log("error in countSignatures function", error);
+        });
+};
+
+ 
+
+
 // Example of an SQL injection attack!
 // createCity("Berlin'; DROP TABLE users;")

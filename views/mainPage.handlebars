@@ -1,23 +1,26 @@
 <div>
 
-    <form method="POST">
+    <form method="POST" id="petition_form">
         <input
             name="firstname"
             type="text"
             class="user-data"
+            id="firstname"
             placeholder="Firstname"
-        />
+        /> <span class="error"><p id="firstname_error"></p></span>
         <input
             name="lastname"
             type="text"
             class="user-data"
+            id="lastname"
             placeholder="Lastname"
-        />
+        /> <span class="error"><p id="lastname_error"></p></span>
         <textarea
             name="signature"
             class="user-data"
+            id="signature"
             placeholder="Please sign here"
-        ></textarea>
+        ></textarea> <span class="error"><p id="signature_error"></p></span>
         <input type="submit" value="Submit your vote" />
     </form>
 

@@ -13,6 +13,7 @@
 9) 
 
 
-
-Friday:
-- setting up the folders & requiring everything needed
+to ask:
+- canvas stickfigure part
+- how to access a value from a promise
+- how to post it into html (handlebars?)
