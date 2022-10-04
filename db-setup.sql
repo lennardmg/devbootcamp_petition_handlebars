@@ -4,5 +4,5 @@ CREATE TABLE signatures (
     id SERIAL primary key,
     firstname VARCHAR(255) NOT NULL CHECK(firstname != ''),
     lastname VARCHAR(255) NOT NULL CHECK(lastname != ''),
-    canvassignature VARCHAR NOT NULL
+    canvassignature TEXT NOT NULL
 );

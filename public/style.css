@@ -41,10 +41,10 @@ form {
     border: 2px solid #cc4949;
 }
 
-textarea {
-    height: 150px;
-    line-height: 150%;
+canvas {
+    border: 2px dotted #cc6666 !important;
     resize: vertical;
+    cursor: url(https://icons.iconarchive.com/icons/awicons/vista-artistic/48/edit-icon.png) 0 38, crosshair;
 }
 
 [type="submit"] {

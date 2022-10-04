@@ -64,10 +64,11 @@ app.get("/main", (req, res) => {
 
 app.post("/main", (req, res) => {
     // console.log("this is the request body: ", req.body);
+    // console.log("the saved signature: ", req.body.savedSignature);
 
     const firstname = req.body.firstname;
     const lastname = req.body.lastname;
-    const signature = req.body.signature;
+    const signature = req.body.savedSignature;
 
     createSignature(firstname, lastname, signature)
         .then((data) => {

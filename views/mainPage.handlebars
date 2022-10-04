@@ -15,13 +15,19 @@
             id="lastname"
             placeholder="Lastname"
         /> <span class="error"><p id="lastname_error"></p></span>
-        <textarea
+        <canvas
             name="signature"
             class="user-data"
             id="signature"
             placeholder="Please sign here"
-        ></textarea> <span class="error"><p id="signature_error"></p></span>
+            width="420" 
+            height="150"
+        > Here, the signature Canvas should be shown. </canvas> 
+        <a href="#" class="button" onclick="clearSignature()">Remove Signature</a>
+        <span class="error"><p id="signature_error"></p></span>
         <input type="submit" value="Submit your vote" />
+
+        <input name="savedSignature" id="savedSignature" type="hidden"/>
     </form>
 
 </div>
