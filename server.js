@@ -1,7 +1,8 @@
-const db = require("./db");
+// const db = require("./db");
 const { getAllSignatures } = require("./db");
 const { createSignature } = require("./db");
 const { countSignatures } = require("./db");
+const { showLastSigner } = require("./db");
 
 const chalk = require("chalk");
 const path = require("path");
@@ -11,7 +12,9 @@ const app = express();
 
 const PORT = 8080;
 
-const cookieParser = require("cookie-parser");
+// const cookieParser = require("cookie-parser");
+// will encript the information within the cookies:
+const cookieSession = require("cookie-session");
 
 const { engine } = require("express-handlebars");
 app.engine("handlebars", engine());
@@ -20,27 +23,35 @@ app.set("view engine", "handlebars");
 /////////////////////////////////// setting the static folder /////////////////////////
 app.use(express.static(path.join(__dirname, "public")));
 
- ////////////////////////////////// MIDDLEWARES /////////////////////////////////////
-     app.use(
-         express.urlencoded({
-             extended: false,
-         })
-     );
+////////////////////////////////// MIDDLEWARES /////////////////////////////////////
+app.use(
+    express.urlencoded({
+        extended: false,
+    })
+);
 
-     app.use(cookieParser());
+// app.use(cookieParser());
+// to activate the cookie session: the string in "secret" could be anything, its kind of like a password
+// at maxAge its Miliseconds
+// sameSite is for security measurements
+app.use(
+    cookieSession({
+        secret: process.env.SESSION_SECRET,
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+        sameSite: true,
+    })
+);
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-
 app.get("/main", (req, res) => {
-
     // to see the content of the signatures table in the petition database:
     // getAllSignatures().then((result) => console.log(result));
 
-    if (!req.cookies.alreadySigned) {
+    if (!req.session.signatureId) {
         res.render("mainPage", {
-        title: "Main Page",
-    })
+            title: "Main Page",
+        });
     } else {
         res.redirect("/thankyou");
     }
@@ -52,18 +63,25 @@ app.get("/main", (req, res) => {
 });
 
 app.post("/main", (req, res) => {
-
     // console.log("this is the request body: ", req.body);
 
-    const a = req.body.firstname;
-    const b = req.body.lastname;
-    const c = req.body.signature;
+    const firstname = req.body.firstname;
+    const lastname = req.body.lastname;
+    const signature = req.body.signature;
 
-    createSignature(a, b, c);
+    createSignature(firstname, lastname, signature)
+        .then((data) => {
+            // console.log(data);
+            req.session.signatureId = data[0].id;
+            res.redirect("/thankyou");
+        })
+        .catch((err) => {
+            console.log("error in POST request from /main", err);
+            // renderWithError(res, "error in post request from /main");
+        });
 
-    res.cookie("alreadySigned", true);    
+    // res.cookie("alreadySigned", true);
 
-    res.redirect("/thankyou");
     // check input: first, last names, signature
     // if they are VALID:
     //     STORE in database
@@ -74,21 +92,27 @@ app.post("/main", (req, res) => {
 });
 
 app.get("/thankyou", (req, res) => {
+    
 
-    countSignatures().then((result) => console.log(result));
+    Promise.all([countSignatures(), showLastSigner(req.session.signatureId)])
 
-    if (req.cookies.alreadySigned) {
+        .then((result) => {
+            // console.log("results in count signatures: ", result);
 
-        res.render("thankyou", {
-            title: "Thanks for your vote!",
-            signatures: 5,
+            if (req.session.signatureId) {
+                res.render("thankyou", {
+                    title: "Thanks for your vote!",
+                    signatures: result[0][0].count,
+                    lastPersonWhoSigned: result[1][0].canvassignature,
+                });
+            } else {
+                res.redirect("/main");
+            }
+        })
+        .catch((err) => {
+            console.log("error in GET request from /thankyou", err);
         });
 
-    } else {
-
-        res.redirect("/main");
-
-    }
     // if user has signed:
     //     Get data from db
     //     Show info: thank you for signing + how many people have signed
@@ -98,13 +122,24 @@ app.get("/thankyou", (req, res) => {
 
 app.get("/signatures", (req, res) => {
 
-    if (req.cookies.alreadySigned) {
-        res.render("signatures", {
-            title: "Supporters",
-        });
-    } else {
-        res.redirect("/main");
-    }
+    getAllSignatures().then((result) => {
+
+        // console.log("results in getAllSignatures: ", result);
+
+        if (req.session.signatureId) {
+            res.render("signatures", {
+                title: "Supporters",
+                signatures: result,
+            });
+        } else {
+            res.redirect("/main");
+        }
+    })
+        .catch((err) => {
+            console.log("error in GET request from /signatures", err);
+    });
+
+
     // if user has signed:
     //     Get data from db
     //     Show info: all previous signatures
@@ -112,11 +147,7 @@ app.get("/signatures", (req, res) => {
     //     REDIRECT to home/petition page
 });
 
-
-
-
-
 ///////////////////// MAKE THE SERVER LISTEN ////////////////////////
 app.listen(PORT, () =>
-    console.log(`Express project running, listening on port:${PORT}`)
+    console.log(`Petition project running, listening on port: ${PORT}`)
 );

@@ -9,7 +9,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const db = spicedPg(DATABASE_URL);
 
 module.exports.getAllSignatures = function () {
-    const sql = "SELECT * FROM signatures;";
+    const sql = "SELECT firstname, lastname FROM signatures;";
     // NB! remember to RETURN the promise!
     return db
         .query(sql)
@@ -46,7 +46,19 @@ module.exports.countSignatures = function () {
         });
 };
 
- 
+ module.exports.showLastSigner = function (signatureId) {
+    //  console.log(signatureId);
+     const sql =
+         `SELECT canvassignature FROM signatures WHERE id= $1;`;
+     return db
+         .query(sql, [signatureId])
+         .then((result) => {
+             return result.rows;
+         })
+         .catch((error) => {
+             console.log("error in showLastSigner function", error);
+         });
+ };
 
 
 // Example of an SQL injection attack!
