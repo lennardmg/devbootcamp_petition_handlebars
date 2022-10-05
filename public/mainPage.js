@@ -1,29 +1,15 @@
 // console.log("script.js in public folder is running");
 
 
-//////////////////////////////// To create the error messages /////////////////////////////////////////
+//////////////////////////////// To create the error messages on /mainPage /////////////////////////////////////////
 const petitionForm = document.getElementById("petition_form");
 
 document.getElementById("petition_form").onsubmit = function () {
     
     let submit = true;
     
-    const firstname = document.forms["petition_form"]["firstname"].value;
-    const lastname = document.forms["petition_form"]["lastname"].value;
     const savedSignature = document.forms["petition_form"]["savedSignature"].value;
 
-
-    if (firstname == null || firstname == "") {
-        let firstnameError = "*Please enter your firstname!";
-        document.getElementById("firstname_error").innerHTML = firstnameError;
-        submit = false;
-    }
-
-    if (lastname == null || lastname == "") {
-        let lastnameError = "*Please enter your lastname!";
-        document.getElementById("lastname_error").innerHTML = lastnameError;
-        submit = false;
-    }
 
     if (savedSignature == null || savedSignature == "") {
         let signatureError = "*Please enter your signature!";
@@ -38,9 +24,9 @@ function removeWarning() {
     document.getElementById(this.id + "_error").innerHTML = "";
 }
 
-document.getElementById("firstname").onkeyup = removeWarning;
-document.getElementById("lastname").onkeyup = removeWarning;
 document.getElementById("signature").onmouseup = removeWarning;
+
+
 
 
 //////////////////////////////// To draw the Canvas /////////////////////////////////////////

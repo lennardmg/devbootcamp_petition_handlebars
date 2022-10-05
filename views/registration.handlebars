@@ -1,0 +1,47 @@
+<div>
+
+    <h3> Please sign up in order to support this petition </h3>
+
+    <form method="POST" id="registration_form">
+        <input
+            name="firstname"
+            type="text"
+            class="user-data"
+            id="firstname"
+            placeholder="Firstname"
+        /> <span class="error"><p id="firstname_error"></p></span>
+
+        <input
+            name="lastname"
+            type="text"
+            class="user-data"
+            id="lastname"
+            placeholder="Lastname"
+        /> <span class="error"><p id="lastname_error"></p></span>
+
+         <input
+            name="email"
+            type="email"
+            class="user-data"
+            id="email"
+            placeholder="Email@email.com"
+        /> <span class="error"><p id="email_error"></p></span>
+
+        <input
+            name="password"
+            type="password"
+            class="user-data"
+            id="password"
+            placeholder="Password"
+        /> <span class="error"><p id="password_error"></p></span>
+        
+
+        <input type="submit" value="Register" />
+
+        <p> Already registered? Then <a href="/logIn">LOG-IN</a> here. </p>
+
+    </form>
+
+</div>
+
+<script src="./registration.js"></script>

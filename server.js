@@ -3,9 +3,14 @@ const { getAllSignatures } = require("./db");
 const { createSignature } = require("./db");
 const { countSignatures } = require("./db");
 const { showLastSigner } = require("./db");
+const { insertUser } = require("./db");
+const { findUserByEmail } = require("./db");
+const { authenticate } = require("./db");
 
 const chalk = require("chalk");
 const path = require("path");
+
+const bcrypt = require("bcryptjs");
 
 const express = require("express");
 const app = express();
@@ -48,12 +53,12 @@ app.get("/main", (req, res) => {
     // to see the content of the signatures table in the petition database:
     // getAllSignatures().then((result) => console.log(result));
 
-    if (!req.session.signatureId) {
+    if (req.session.userId) {
         res.render("mainPage", {
             title: "Main Page",
         });
     } else {
-        res.redirect("/thankyou");
+        res.redirect("/registration");
     }
 
     // if user has NOT signed:
@@ -66,14 +71,11 @@ app.post("/main", (req, res) => {
     // console.log("this is the request body: ", req.body);
     // console.log("the saved signature: ", req.body.savedSignature);
 
-    const firstname = req.body.firstname;
-    const lastname = req.body.lastname;
     const signature = req.body.savedSignature;
 
-    createSignature(firstname, lastname, signature)
+    createSignature(signature)
         .then((data) => {
             // console.log(data);
-            req.session.signatureId = data[0].id;
             res.redirect("/thankyou");
         })
         .catch((err) => {
@@ -81,15 +83,7 @@ app.post("/main", (req, res) => {
             // renderWithError(res, "error in post request from /main");
         });
 
-    // res.cookie("alreadySigned", true);
 
-    // check input: first, last names, signature
-    // if they are VALID:
-    //     STORE in database
-    //     SET a cookie
-    //     REDIRECT to thank-you page
-    // else:
-    //     show the form again with an error message
 });
 
 app.get("/thankyou", (req, res) => {
@@ -100,14 +94,14 @@ app.get("/thankyou", (req, res) => {
         .then((result) => {
             // console.log("results in count signatures: ", result);
 
-            if (req.session.signatureId) {
+            if (req.session.userId) {
                 res.render("thankyou", {
                     title: "Thanks for your vote!",
                     signatures: result[0][0].count,
                     lastPersonWhoSigned: result[1][0].canvassignature,
                 });
             } else {
-                res.redirect("/main");
+                res.redirect("/registration");
             }
         })
         .catch((err) => {
@@ -127,13 +121,13 @@ app.get("/signatures", (req, res) => {
 
         // console.log("results in getAllSignatures: ", result);
 
-        if (req.session.signatureId) {
+        if (req.session.userId) {
             res.render("signatures", {
                 title: "Supporters",
                 signatures: result,
             });
         } else {
-            res.redirect("/main");
+            res.redirect("/registration");
         }
     })
         .catch((err) => {
@@ -147,6 +141,105 @@ app.get("/signatures", (req, res) => {
     // else:
     //     REDIRECT to home/petition page
 });
+
+
+////////////////////// Part 3, registration ////////////////////////////
+
+app.get("/registration", (req, res) => {
+
+res.render("registration", {
+    title: "Register",
+});
+
+});
+
+
+app.post("/registration", (req, res) => {
+
+    const firstname = req.body.firstname;
+    const lastname = req.body.lastname;
+    const email = req.body.email;
+    // first the password needs to be encrypted/hashed:
+    const password = req.body.password;
+
+    console.log("password from user: ", password);
+    
+    function hashing() {
+        const initalPassword = password;
+        let hashedPassword = "";
+       
+        bcrypt
+            .genSalt()
+            .then((salt) => {
+                return bcrypt.hash(initalPassword, salt);
+            })
+            .then((hash) => {
+                hashedPassword = hash;
+                console.log("hashedPassword: ", hashedPassword);
+            })
+            .then(() => {
+
+                // now all of the user data + the hashed password is going to get inserted in the users table
+                insertUser(firstname, lastname, email, hashedPassword)
+                    .then((data) => {
+                          console.log("data: ", data);
+                          req.session.userId = data[0].id;
+                          res.redirect("/main");
+                    })
+                    .catch((err) => {
+                        console.log("error in POST request from /registration", err);
+                    });
+
+            })
+            .catch((err) => {
+            console.log("error in hashing function inside POST request from /registration ", err);
+            });
+    }
+
+    hashing();
+
+
+});
+
+
+
+app.get("/logIn", (req, res) => {
+    res.render("logIn", {
+        title: "Log-In",
+    });
+});
+
+
+
+app.post("/logIn", (req, res) => {
+
+ const email = req.body.email;
+ const password = req.body.password;
+
+ findUserByEmail(email)
+     .then((result) => {
+        console.log("results in findUserByEmail: ", result);
+        if (result == []) {
+            console.log("NO USER FOUND");
+        } else {
+            authenticate(password, result[0].password)
+        }
+
+     })
+     .catch((err) => {
+         console.log("error in POST request from /logIn", err);
+     });
+
+
+});
+
+
+app.get("/logOut", (req, res) => {
+    
+res.redirect("/registration")
+
+});
+
 
 ///////////////////// MAKE THE SERVER LISTEN ////////////////////////
 app.listen(PORT, () =>

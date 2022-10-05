@@ -1,19 +1,8 @@
-1) setup server (express, listening etc.)
-2) html templates (handlebars), html for the 3 routes (mainPage / Thanks / Signatures)
-2,5) CSS for the 3 routes
-3) create Database
 
-3) logic for the requests (GET / POST)
-4) Cookie if already signed
-5) writing the three functions needed (sendSignature / getSignature / countSignature)
-6) connecting everything
+1) how to link User_Id from signatures to id from users ???
 
-7) adjusting the JS/HTML to show what was done in the steps before
-8) trying out the canvas signature part
-9) 
+2) how to continue after finding out that the email/password matches??
 
+3) where to set which exact cookie? how can we assign it more information??
 
-to ask:
-- canvas stickfigure part
-- how to access a value from a promise
-- how to post it into html (handlebars?)
+4) what happens exactly at the LogOut? remove cookie?

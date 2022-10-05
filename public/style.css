@@ -1,12 +1,12 @@
-body {
-    background: blanchedalmond;
+body{
+ background-color: antiquewhite;
 }
 
 h1 {
     text-align: center;
 }
 
-h3 {
+h2, h3 {
     text-align: center;
 }
 
