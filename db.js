@@ -8,6 +8,8 @@ const DATABASE_URL = process.env.DATABASE_URL;
 // create a db object. it can talk to the database: use db.query(...)
 const db = spicedPg(DATABASE_URL);
 
+
+
 module.exports.getAllSignatures = function () {
     const sql = "SELECT firstname, lastname FROM signatures;";
     // NB! remember to RETURN the promise!
@@ -20,6 +22,8 @@ module.exports.getAllSignatures = function () {
             console.log("error in getAllSignatures function", error);
         });
 };
+
+
 
 module.exports.createSignature = function (firstname, lastname, canvassignature) {
     const sql = `
@@ -34,6 +38,8 @@ module.exports.createSignature = function (firstname, lastname, canvassignature)
         .catch((error) => console.log("error in createSignature function", error));
 };
 
+
+
 module.exports.countSignatures = function () {
     const sql = "SELECT COUNT(*) FROM signatures;";
     return db
@@ -45,6 +51,8 @@ module.exports.countSignatures = function () {
             console.log("error in countSignatures function", error);
         });
 };
+
+
 
  module.exports.showLastSigner = function (signatureId) {
     //  console.log(signatureId);
