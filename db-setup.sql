@@ -1,11 +1,5 @@
 DROP TABLE IF EXISTS signatures;
-
-CREATE TABLE signatures (
-    id SERIAL PRIMARY KEY,
-    canvassignature TEXT NOT NULL,
-    user_id INT NOT NULL
-);
-
+DROP TABLE IF EXISTS profiles;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
@@ -14,5 +8,22 @@ CREATE TABLE users (
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE signatures (
+    id SERIAL PRIMARY KEY,
+    canvassignature TEXT NOT NULL,
+    user_id INT REFERENCES users(id)
+);
+
+
+CREATE TABLE profiles (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    age INT,
+    city VARCHAR(100),
+    homepage VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

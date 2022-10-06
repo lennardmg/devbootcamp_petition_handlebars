@@ -1,0 +1,40 @@
+<a href="/logOut" style="color:green; float: right">LOG-OUT</a>
+
+<h3> Nice to have you on board {{ name }}, would you like to provide us with some more information about yourself? </h3>
+
+<form method="POST" id="profile_form">
+
+         <input
+            name="age"
+            type="number"
+            min="18" 
+            max="99"
+            class="user-data"
+            id="age"
+            placeholder="Your age"
+        />
+
+        <input
+            name="city"
+            type="text"
+            class="user-data"
+            id="city"
+            placeholder="Your city"
+        />
+
+        <input
+            name="homepage"
+            type="url"
+            class="user-data"
+            id="homepage"
+            placeholder="Your Homepage"
+        />
+        
+
+        <input type="submit" value="Edit Info" />
+
+        <p style="color:red" > {{ error }} </p>
+
+    </form>
+
+    <h4> If you want to keep that to yourself, no problem, go directly to <a href="/main">SIGN</a> our petition.</h4>

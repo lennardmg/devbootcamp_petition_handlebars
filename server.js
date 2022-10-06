@@ -6,6 +6,7 @@ const { showLastSigner } = require("./db");
 const { insertUser } = require("./db");
 const { findUserByEmail } = require("./db");
 const { authenticate } = require("./db");
+const { insertProfile } = require("./db");
 
 const chalk = require("chalk");
 const path = require("path");
@@ -183,11 +184,15 @@ app.post("/registration", (req, res) => {
                 insertUser(firstname, lastname, email, hashedPassword)
                     .then((data) => {
                           console.log("data: ", data);
-                          req.session.userId = data[0].id;
-                          res.redirect("/main");
+                          req.session.userId = data;
+                          res.redirect("/profile");
                     })
                     .catch((err) => {
                         console.log("error in POST request from /registration", err);
+                        res.render("registration", {
+                            title: "Register",
+                            error: "*Something went wrong. Please try again!"
+                        });
                     });
 
             })
@@ -217,17 +222,36 @@ app.post("/logIn", (req, res) => {
  const password = req.body.password;
 
  findUserByEmail(email)
-     .then((result) => {
-        console.log("results in findUserByEmail: ", result);
-        if (result == []) {
-            console.log("NO USER FOUND");
-        } else {
-            authenticate(password, result[0].password)
-        }
+     .then((user) => {
+        
+        console.log("users in findUserByEmail: ", user);
+         if (!user.length) {
+             console.log("NO USER FOUND");
+             res.render("logIn", {
+                 title: "Log-In",
+                 error: "*Something went wrong. Please try again!",
+             });
+             return false;
+         } 
 
+         const userInfo = user;
+            
+        authenticate(password, user[0].password).then((result) => {
+            console.log("results after athenticating: ", result);
+            console.log("user after athenticating: ", userInfo);
+            req.session.userId = userInfo;
+            res.redirect("/profile");
+        })
+        .catch((err) => {
+            console.log("error after athentication process: ", err);
+        })
      })
      .catch((err) => {
-         console.log("error in POST request from /logIn", err);
+        //  console.log("error in POST request from /logIn", err);
+         res.render("logIn", {
+             title: "Log-In",
+             error: "*Something went wrong. Please try again!",
+         });
      });
 
 
@@ -236,8 +260,39 @@ app.post("/logIn", (req, res) => {
 
 app.get("/logOut", (req, res) => {
     
-res.redirect("/registration")
+    req.session = null;
+    res.redirect("/logIn")
 
+});
+
+////////////////////// Part 4, profile information ////////////////////////////
+
+app.get("/profile", (req, res) => {
+
+    console.log("my cookie: ", req.session.userId);
+
+  res.render("profile", {
+      title: "Your Profile",
+      name: req.session.userId[0].first_name
+  });
+
+});
+
+
+app.post("/profile", (req, res) => {
+    
+    const age = req.body.age;
+    const city = req.body.city;
+    const homepage = req.body.homepage;
+
+    insertProfile(req.session.userId[0].id, age, city, homepage)
+        .then((profileData) => {
+            console.log("profileData after insertProfile: ", profileData);
+            res.redirect("/main")
+        })
+        .catch((err) => {
+            console.log("error in POST request from /profile", err);
+        });
 });
 
 

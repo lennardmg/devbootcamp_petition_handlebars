@@ -1,8 +1,8 @@
 
-1) how to link User_Id from signatures to id from users ???
+1) implement upserting in insertProfile function
 
-2) how to continue after finding out that the email/password matches??
+2) update signature function / show signers etc. (joining the three tables etc.)
 
-3) where to set which exact cookie? how can we assign it more information??
+3) show information on signers page
 
-4) what happens exactly at the LogOut? remove cookie?
+4) implement handlebars for the links (city etc.)
