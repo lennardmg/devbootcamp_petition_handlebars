@@ -1,5 +1,6 @@
 
-1) implement upserting in insertProfile function
+1) adding your signatureId to req.session after signing
+1,5) when signing in, join the users table with signatures table and add both
 
 2) update signature function / show signers etc. (joining the three tables etc.)
 

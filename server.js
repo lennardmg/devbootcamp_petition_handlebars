@@ -74,9 +74,11 @@ app.post("/main", (req, res) => {
 
     const signature = req.body.savedSignature;
 
-    createSignature(signature)
+    createSignature(req.session.userId[0].id, signature)
         .then((data) => {
             // console.log(data);
+            // console.log("userId cookie: ", req.session.userId[0].id);
+            req.session.signed = true;
             res.redirect("/thankyou");
         })
         .catch((err) => {
@@ -90,10 +92,10 @@ app.post("/main", (req, res) => {
 app.get("/thankyou", (req, res) => {
     
 
-    Promise.all([countSignatures(), showLastSigner(req.session.signatureId)])
+    Promise.all([countSignatures(), showLastSigner(req.session.userId[0].id)])
 
         .then((result) => {
-            // console.log("results in count signatures: ", result);
+            console.log("results in count signatures: ", result);
 
             if (req.session.userId) {
                 res.render("thankyou", {

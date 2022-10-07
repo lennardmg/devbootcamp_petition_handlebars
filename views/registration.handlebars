@@ -6,6 +6,8 @@
         <input
             name="firstname"
             type="text"
+            pattern="[\p{Letter}\-'ßñÄÖÜäüöæÆÅåØø]+"
+            title="No numbers allowed."
             class="user-data"
             id="firstname"
             placeholder="Firstname"
@@ -14,6 +16,8 @@
         <input
             name="lastname"
             type="text"
+            pattern="[\p{Letter}\-'ßñÄÖÜäüöæÆÅåØø]+"
+            title="No numbers allowed."
             class="user-data"
             id="lastname"
             placeholder="Lastname"
@@ -22,6 +26,8 @@
          <input
             name="email"
             type="email"
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+            title="Please enter a valid E-Mail address."
             class="user-data"
             id="email"
             placeholder="Email@email.com"

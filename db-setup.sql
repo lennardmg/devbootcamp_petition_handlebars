@@ -15,13 +15,13 @@ CREATE TABLE users (
 CREATE TABLE signatures (
     id SERIAL PRIMARY KEY,
     canvassignature TEXT NOT NULL,
-    user_id INT REFERENCES users(id)
+    user_id INT UNIQUE REFERENCES users(id)
 );
 
 
 CREATE TABLE profiles (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id),
+    user_id INT UNIQUE REFERENCES users(id),
     age INT,
     city VARCHAR(100),
     homepage VARCHAR(100),

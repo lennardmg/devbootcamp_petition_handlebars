@@ -26,15 +26,15 @@ module.exports.getAllSignatures = function () {
 };
 
 
-module.exports.createSignature = function (canvassignature) {
+module.exports.createSignature = function (user_id, canvassignature) {
     const sql = `
-        INSERT INTO signatures (canvassignature)
-        VALUES ($1)
+        INSERT INTO signatures (user_id, canvassignature)
+        VALUES ($1, $2)
         RETURNING *;
     `;
     // Here we are using SAFE interpolation to protect against SQL injection attacks
     return db
-        .query(sql, [canvassignature])
+        .query(sql, [user_id, canvassignature])
         .then((result) => result.rows)
         .catch((error) =>
             console.log("error in createSignature function", error)
@@ -55,12 +55,13 @@ module.exports.countSignatures = function () {
 };
 
 
-module.exports.showLastSigner = function (signatureId) {
+module.exports.showLastSigner = function (user_id) {
     //  console.log(signatureId);
-    const sql = `SELECT canvassignature FROM signatures WHERE id= $1;`;
+    const sql = `SELECT canvassignature FROM signatures WHERE user_id = $1;`;
     return db
-        .query(sql, [signatureId])
+        .query(sql, [user_id])
         .then((result) => {
+            console.log("results in showlastsigner function: ", result);
             return result.rows;
         })
         .catch((error) => {
@@ -109,6 +110,8 @@ module.exports.insertProfile = function (user_id, age, city, homepage) {
     const sql = `
         INSERT INTO profiles (user_id, age, city, homepage)
         VALUES ($1, $2, $3, $4)
+        ON CONFLICT (user_id)
+        DO UPDATE SET age = $2, city = $3, homepage = $4 
         RETURNING *;
     `;
     // Here we are using SAFE interpolation to protect against SQL injection attacks
