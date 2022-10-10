@@ -79,7 +79,7 @@ module.exports.showLastSigner = function (user_id) {
     return db
         .query(sql, [user_id])
         .then((result) => {
-            console.log("results in showlastsigner function: ", result);
+            // console.log("results in showlastsigner function: ", result);
             return result.rows;
         })
         .catch((error) => {
@@ -180,6 +180,21 @@ module.exports.deleteSignature = (user_id) => {
     return db.query(sql, [user_id]);
 
 };
+
+
+
+module.exports.checkForSignature = (user_id) => {
+    const sql = ` SELECT
+      CASE WHEN EXISTS 
+      (
+            SELECT canvassignature FROM signatures WHERE user_id = $1
+      )
+      THEN 'true'
+      ELSE 'false'
+   END;`;
+    return db.query(sql, [user_id]);
+};
+
 
 // Example of an SQL injection attack!
 // createCity("Berlin'; DROP TABLE users;")

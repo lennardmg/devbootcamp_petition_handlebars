@@ -12,6 +12,7 @@ const { getUserInfo } = require("./db");
 const { deleteSignature } = require("./db");
 const { updateUserWithoutPassword } = require("./db");
 const { updateUserWithPassword } = require("./db");
+const { checkForSignature } = require("./db");
 
 const chalk = require("chalk");
 const path = require("path");
@@ -55,31 +56,26 @@ app.use(
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-app.get("/main", (req, res) => {
+app.get("/petition", (req, res) => {
     // to see the content of the signatures table in the petition database:
     // getAllSignatures().then((result) => console.log(result));
 
-    if (req.session.userId) {
-        res.render("mainPage", {
-            title: "Main Page",
+    if (req.session.userId && req.session.signed == false) {
+        res.render("petition", {
+            title: "Sign Here",
         });
     } else {
-        res.redirect("/registration");
+        res.redirect("/thankyou");
     }
-
-    // if user has NOT signed:
-    //    render the petition page with the form
-    // else
-    //    REDIRECT to thank-you page
 });
 
-app.post("/main", (req, res) => {
+app.post("/petition", (req, res) => {
     // console.log("this is the request body: ", req.body);
     // console.log("the saved signature: ", req.body.savedSignature);
 
     const signature = req.body.savedSignature;
 
-    createSignature(req.session.userId[0].id, signature)
+    createSignature(req.session.userId, signature)
         .then((data) => {
             // console.log(data);
             // console.log("userId cookie: ", req.session.userId[0].id);
@@ -88,7 +84,6 @@ app.post("/main", (req, res) => {
         })
         .catch((err) => {
             console.log("error in POST request from /main", err);
-            // renderWithError(res, "error in post request from /main");
         });
 
 
@@ -97,16 +92,16 @@ app.post("/main", (req, res) => {
 app.get("/thankyou", (req, res) => {
     
 
-    Promise.all([countSignatures(), showLastSigner(req.session.userId[0].id)])
+    Promise.all([countSignatures(), showLastSigner(req.session.userId)])
 
         .then((result) => {
             console.log("results in count signatures: ", result);
 
-            if (req.session.userId) {
+            if (req.session.userId && req.session.signed == true) {
                 res.render("thankyou", {
                     title: "Thanks for your vote!",
                     signatures: result[0][0].count,
-                    name: req.session.userId[0].first_name,
+                    name: req.session.userName,
                     lastPersonWhoSigned: result[1][0].canvassignature,
                 });
             } else {
@@ -116,12 +111,6 @@ app.get("/thankyou", (req, res) => {
         .catch((err) => {
             console.log("error in GET request from /thankyou", err);
         });
-
-    // if user has signed:
-    //     Get data from db
-    //     Show info: thank you for signing + how many people have signed
-    // else:
-    //     REDIRECT to home/petition page
 });
 
 app.get("/signatures", (req, res) => {
@@ -130,7 +119,7 @@ app.get("/signatures", (req, res) => {
 
         console.log("results in getAllSignatures: ", result);
 
-        if (req.session.userId) {
+        if (req.session.userId && req.session.signed == true) {
             res.render("signatures", {
                 title: "Supporters",
                 signatures: result,
@@ -154,7 +143,6 @@ res.render("registration", {
 });
 
 });
-
 
 
 
@@ -186,8 +174,11 @@ app.post("/registration", (req, res) => {
                 // now all of the user data + the hashed password is going to get inserted in the users table
                 insertUser(firstname, lastname, email, hashedPassword)
                     .then((data) => {
-                        //   console.log("data: ", data);
-                          req.session.userId = data[0].id;
+                        console.log("data in Post registration: ", data);
+                        req.session.userId = data[0].id;
+                        req.session.userName = data[0].first_name;
+                        req.session.signed = false;
+                        
                           res.redirect("/profile");
                     })
                     .catch((err) => {
@@ -203,10 +194,7 @@ app.post("/registration", (req, res) => {
             console.log("error in hashing function inside POST request from /registration ", err);
             });
     }
-
     hashing();
-
-
 });
 
 
@@ -240,10 +228,26 @@ app.post("/logIn", (req, res) => {
          const userInfo = user;
             
         authenticate(password, user[0].password).then((result) => {
-            console.log("results after athenticating: ", result);
-            console.log("user after athenticating: ", userInfo);
+            // console.log("results after athenticating: ", result);
+            // console.log("user after athenticating: ", userInfo);
+
             req.session.userId = userInfo[0].id;
-            res.redirect("/profile");
+            req.session.userName = userInfo[0].first_name;
+
+            // to check if user has previously signed:
+            checkForSignature(req.session.userId).then((result) => {
+                // console.log("result in checkForSignature: ", result.rows[0].case);
+
+                if (result.rows[0].case == "true") {
+                    req.session.signed = true;
+                    // console.log(req.session);
+                    res.redirect("/petition");
+                } else {
+                    req.session.signed = false;
+                    // console.log(req.session);
+                    res.redirect("/petition");
+                }
+            });
         })
         .catch((err) => {
             console.log("error after athentication process: ", err);
@@ -271,7 +275,7 @@ app.get("/profile", (req, res) => {
 
   res.render("profile", {
       title: "Your Profile",
-      name: req.session.userId[0].first_name
+      name: req.session.userName
   });
 
 });
@@ -279,16 +283,16 @@ app.get("/profile", (req, res) => {
 
 app.post("/profile", (req, res) => {
     
-    const age = req.body.age;
+    const age = req.body.age || null;
     const city = req.body.city;
     const homepage = req.body.homepage;
 
-    insertProfile(req.session.userId[0].id, age, city, homepage)
+    insertProfile(req.session.userId, age, city, homepage)
         .then((profileData) => {
             // console.log("userId at inserting profile ", req.session.userId[0].id);
             // console.log("age, city and homepage at inserting profile: ", age, city, homepage);
             // console.log("profileData after insertProfile: ", profileData);
-            res.redirect("/main")
+            res.redirect("/petition")
         })
         .catch((err) => {
             console.log("error in POST request from /profile", err);
@@ -304,7 +308,7 @@ app.get("/signatures/:city", (req, res) => {
     getAllSignaturesByCity(city)
         .then((result) => {
 
-            if (req.session.userId) {
+            if (req.session.userId && req.session.signed == true) {
                 res.render("signaturesByCity", {
                     title: `Supporters from ${city}`,
                     city: city,
@@ -324,8 +328,8 @@ app.get("/signatures/:city", (req, res) => {
 app.get("/profileEdit", (req, res) => {
 
     if (req.session.userId) {
-
-        getUserInfo(req.session.userId[0].id)
+        // console.log(req.session);
+        getUserInfo(req.session.userId)
         .then((userData) => {
     
         res.render("profileEdit", {
@@ -350,7 +354,6 @@ app.get("/profileEdit", (req, res) => {
 });
 
 
-
 app.post("/profileEdit", (req, res) => {
  
         const firstname = req.body.firstname;
@@ -362,29 +365,26 @@ app.post("/profileEdit", (req, res) => {
 
         const password = req.body.password;
 
-
             if (req.session.userId) {
                   
-
                 /////////  when the user does NOT change his/her password:  ////////////
                 if (password == "") {
                     
                     Promise.all([
                         insertProfile(
-                            req.session.userId[0].id,
+                            req.session.userId,
                             age,
                             city,
                             homepage
                         ),
-                        updateUserWithoutPassword(req.session.userId[0].id, firstname, lastname, email)
+                        updateUserWithoutPassword(req.session.userId, firstname, lastname, email)
                     ])
                     .then(() => {
-                        res.redirect("/main");
+                        res.redirect("/petition");
                     })
                     .catch((err) => {
                         console.log("error in updateUserWithoutPassword at post /profileEdit: ", err);
                     });
-
 
                     //// when the user DOES change his/her password
                 } else {
@@ -406,13 +406,13 @@ app.post("/profileEdit", (req, res) => {
                                 
                                       Promise.all([
                                           insertProfile(
-                                              req.session.userId[0].id,
+                                              req.session.userId,
                                               age,
                                               city,
                                               homepage
                                           ),
                                           updateUserWithPassword(
-                                              req.session.userId[0].id,
+                                              req.session.userId,
                                               firstname,
                                               lastname,
                                               email,
@@ -420,7 +420,7 @@ app.post("/profileEdit", (req, res) => {
                                           ),
                                       ])
                                           .then(() => {
-                                              res.redirect("/main");
+                                              res.redirect("/petition");
                                           })
                                           .catch((err) => {
                                               console.log(
@@ -439,7 +439,6 @@ app.post("/profileEdit", (req, res) => {
                     }
 
                     hashing();
-
                 }
 
                 ////////////////////////////////////////////
@@ -450,27 +449,29 @@ app.post("/profileEdit", (req, res) => {
 
 
 
-
-app.post("/mainPage/delete", (req, res) => {
+app.post("/petition/delete", (req, res) => {
 
     if (req.session.userId) {
         
-        deleteSignature(req.session.userId[0].id)
+        deleteSignature(req.session.userId && req.session.signed == true)
             .then(() => {
-                res.redirect("/mainPage", {
+                res.redirect("/petition", {
                     title: "Sign here",
                     message: "Your signature got successfully deleted."
                 });
             })
             .catch((err) => {
-                console.log("error in deleteSignature in post /mainPage/delete: ", err);
+                console.log("error in deleteSignature in post /petition/delete: ", err);
+                res.redirect("/petition", {
+                    title: "Sign here",
+                    message: "Nothing to delete. Please sign and support us!",
+                });
             });
 
     } else {
         res.redirect("/registration");
     }
 });
-
 
 ///////////////////// MAKE THE SERVER LISTEN ////////////////////////
 app.listen(PORT, () =>
