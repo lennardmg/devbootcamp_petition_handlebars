@@ -7,6 +7,11 @@ const { insertUser } = require("./db");
 const { findUserByEmail } = require("./db");
 const { authenticate } = require("./db");
 const { insertProfile } = require("./db");
+const { getAllSignaturesByCity } = require("./db");
+const { getUserInfo } = require("./db");
+const { deleteSignature } = require("./db");
+const { updateUserWithoutPassword } = require("./db");
+const { updateUserWithPassword } = require("./db");
 
 const chalk = require("chalk");
 const path = require("path");
@@ -101,6 +106,7 @@ app.get("/thankyou", (req, res) => {
                 res.render("thankyou", {
                     title: "Thanks for your vote!",
                     signatures: result[0][0].count,
+                    name: req.session.userId[0].first_name,
                     lastPersonWhoSigned: result[1][0].canvassignature,
                 });
             } else {
@@ -122,7 +128,7 @@ app.get("/signatures", (req, res) => {
 
     getAllSignatures().then((result) => {
 
-        // console.log("results in getAllSignatures: ", result);
+        console.log("results in getAllSignatures: ", result);
 
         if (req.session.userId) {
             res.render("signatures", {
@@ -136,13 +142,6 @@ app.get("/signatures", (req, res) => {
         .catch((err) => {
             console.log("error in GET request from /signatures", err);
     });
-
-
-    // if user has signed:
-    //     Get data from db
-    //     Show info: all previous signatures
-    // else:
-    //     REDIRECT to home/petition page
 });
 
 
@@ -157,6 +156,8 @@ res.render("registration", {
 });
 
 
+
+
 app.post("/registration", (req, res) => {
 
     const firstname = req.body.firstname;
@@ -165,7 +166,7 @@ app.post("/registration", (req, res) => {
     // first the password needs to be encrypted/hashed:
     const password = req.body.password;
 
-    console.log("password from user: ", password);
+    // console.log("password from user: ", password);
     
     function hashing() {
         const initalPassword = password;
@@ -178,15 +179,15 @@ app.post("/registration", (req, res) => {
             })
             .then((hash) => {
                 hashedPassword = hash;
-                console.log("hashedPassword: ", hashedPassword);
+                // console.log("hashedPassword: ", hashedPassword);
             })
             .then(() => {
 
                 // now all of the user data + the hashed password is going to get inserted in the users table
                 insertUser(firstname, lastname, email, hashedPassword)
                     .then((data) => {
-                          console.log("data: ", data);
-                          req.session.userId = data;
+                        //   console.log("data: ", data);
+                          req.session.userId = data[0].id;
                           res.redirect("/profile");
                     })
                     .catch((err) => {
@@ -226,7 +227,7 @@ app.post("/logIn", (req, res) => {
  findUserByEmail(email)
      .then((user) => {
         
-        console.log("users in findUserByEmail: ", user);
+        // console.log("users in findUserByEmail: ", user);
          if (!user.length) {
              console.log("NO USER FOUND");
              res.render("logIn", {
@@ -241,22 +242,17 @@ app.post("/logIn", (req, res) => {
         authenticate(password, user[0].password).then((result) => {
             console.log("results after athenticating: ", result);
             console.log("user after athenticating: ", userInfo);
-            req.session.userId = userInfo;
+            req.session.userId = userInfo[0].id;
             res.redirect("/profile");
         })
         .catch((err) => {
             console.log("error after athentication process: ", err);
+            res.render("logIn", {
+                title: "Log-In",
+                error: "*Something went wrong. Please try again!",
+            });
         })
-     })
-     .catch((err) => {
-        //  console.log("error in POST request from /logIn", err);
-         res.render("logIn", {
-             title: "Log-In",
-             error: "*Something went wrong. Please try again!",
-         });
      });
-
-
 });
 
 
@@ -289,12 +285,190 @@ app.post("/profile", (req, res) => {
 
     insertProfile(req.session.userId[0].id, age, city, homepage)
         .then((profileData) => {
-            console.log("profileData after insertProfile: ", profileData);
+            // console.log("userId at inserting profile ", req.session.userId[0].id);
+            // console.log("age, city and homepage at inserting profile: ", age, city, homepage);
+            // console.log("profileData after insertProfile: ", profileData);
             res.redirect("/main")
         })
         .catch((err) => {
             console.log("error in POST request from /profile", err);
         });
+});
+
+
+
+app.get("/signatures/:city", (req, res) => {
+    
+    let city = req.params.city;
+
+    getAllSignaturesByCity(city)
+        .then((result) => {
+
+            if (req.session.userId) {
+                res.render("signaturesByCity", {
+                    title: `Supporters from ${city}`,
+                    city: city,
+                    signatures: result,
+                });
+            } else {
+                res.redirect("/registration");
+            }
+        })
+        .catch((err) => {
+            console.log("error in GET request from /signaturesByCity", err);
+        });
+});
+
+////////////////////// Part 5, edit profile information ////////////////////////////
+
+app.get("/profileEdit", (req, res) => {
+
+    if (req.session.userId) {
+
+        getUserInfo(req.session.userId[0].id)
+        .then((userData) => {
+    
+        res.render("profileEdit", {
+            title: "Your Profile",
+            name: userData.rows[0].first_name,
+            firstname: userData.rows[0].first_name,
+            lastname: userData.rows[0].last_name,
+            email: userData.rows[0].email,
+            age: userData.rows[0].age,
+            city: userData.rows[0].city,
+            homepage: userData.rows[0].homepage,
+        });
+    
+        })
+        .catch((err) => {
+            console.log("error in getUserInfo in get /profileEdit: ", err);
+        })
+
+    } else {
+        res.redirect("/registration");
+    }
+});
+
+
+
+app.post("/profileEdit", (req, res) => {
+ 
+        const firstname = req.body.firstname;
+        const lastname = req.body.lastname;
+        const email = req.body.email;
+        const age = req.body.age;
+        const city = req.body.city;
+        const homepage = req.body.homepage;
+
+        const password = req.body.password;
+
+
+            if (req.session.userId) {
+                  
+
+                /////////  when the user does NOT change his/her password:  ////////////
+                if (password == "") {
+                    
+                    Promise.all([
+                        insertProfile(
+                            req.session.userId[0].id,
+                            age,
+                            city,
+                            homepage
+                        ),
+                        updateUserWithoutPassword(req.session.userId[0].id, firstname, lastname, email)
+                    ])
+                    .then(() => {
+                        res.redirect("/main");
+                    })
+                    .catch((err) => {
+                        console.log("error in updateUserWithoutPassword at post /profileEdit: ", err);
+                    });
+
+
+                    //// when the user DOES change his/her password
+                } else {
+
+                    function hashing() {
+                        const initalPassword = password;
+                        let hashedPassword = "";
+
+                        bcrypt
+                            .genSalt()
+                            .then((salt) => {
+                                return bcrypt.hash(initalPassword, salt);
+                            })
+                            .then((hash) => {
+                                hashedPassword = hash;
+                                // console.log("hashedPassword: ", hashedPassword);
+                            })
+                            .then(() => {
+                                
+                                      Promise.all([
+                                          insertProfile(
+                                              req.session.userId[0].id,
+                                              age,
+                                              city,
+                                              homepage
+                                          ),
+                                          updateUserWithPassword(
+                                              req.session.userId[0].id,
+                                              firstname,
+                                              lastname,
+                                              email,
+                                              hashedPassword
+                                          ),
+                                      ])
+                                          .then(() => {
+                                              res.redirect("/main");
+                                          })
+                                          .catch((err) => {
+                                              console.log(
+                                                  "error in updateUserWithPassword at post /profileEdit: ",
+                                                  err
+                                              );
+                                          });
+
+                            })
+                            .catch((err) => {
+                                console.log(
+                                    "error in hashing function inside POST request from /profileEdit ",
+                                    err
+                                );
+                            });
+                    }
+
+                    hashing();
+
+                }
+
+                ////////////////////////////////////////////
+            } else {
+                      res.redirect("/registration");
+            }
+});
+
+
+
+
+app.post("/mainPage/delete", (req, res) => {
+
+    if (req.session.userId) {
+        
+        deleteSignature(req.session.userId[0].id)
+            .then(() => {
+                res.redirect("/mainPage", {
+                    title: "Sign here",
+                    message: "Your signature got successfully deleted."
+                });
+            })
+            .catch((err) => {
+                console.log("error in deleteSignature in post /mainPage/delete: ", err);
+            });
+
+    } else {
+        res.redirect("/registration");
+    }
 });
 
 

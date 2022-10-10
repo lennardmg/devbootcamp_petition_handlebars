@@ -1,14 +1,13 @@
-//////////////////////////////// To create the error messages on /registration /////////////////////////////////////////
+//////////////////////////////// To create the error messages on /profileEdit /////////////////////////////////////////
 
-const registrationForm = document.getElementById("registration_form");
+const registrationForm = document.getElementById("updateProfile_form");
 
-document.getElementById("registration_form").onsubmit = function () {
+document.getElementById("updateProfile_form").onsubmit = function () {
     let submit = true;
 
-    const firstname = document.forms["registration_form"]["firstname"].value;
-    const lastname = document.forms["registration_form"]["lastname"].value;
-    const email = document.forms["registration_form"]["email"].value;
-    const password = document.forms["registration_form"]["password"].value;
+    const firstname = document.forms["updateProfile_form"]["firstname"].value;
+    const lastname = document.forms["updateProfile_form"]["lastname"].value;
+    const email = document.forms["updateProfile_form"]["email"].value;
 
     if (firstname == null || firstname == "") {
         let firstnameError = "*Please enter your firstname!";
@@ -23,14 +22,8 @@ document.getElementById("registration_form").onsubmit = function () {
     }
 
     if (email == null || email == "") {
-        let emailError = "*Please enter your E-Mail!";
+        let emailError = "*Please enter an E-Mail!";
         document.getElementById("email_error").innerHTML = emailError;
-        submit = false;
-    }
-
-    if (password == null || password == "") {
-        let passwordError = "*Please enter a password!";
-        document.getElementById("password_error").innerHTML = passwordError;
         submit = false;
     }
 
@@ -44,5 +37,3 @@ function removeWarning() {
 document.getElementById("firstname").onkeyup = removeWarning;
 document.getElementById("lastname").onkeyup = removeWarning;
 document.getElementById("email").onkeyup = removeWarning;
-document.getElementById("password").onkeyup = removeWarning;
-

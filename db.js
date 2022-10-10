@@ -13,7 +13,9 @@ const db = spicedPg(DATABASE_URL);
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports.getAllSignatures = function () {
-    const sql = "SELECT id FROM signatures;";
+    const sql = `SELECT users.first_name, users.last_name, profiles.age, profiles.city, 
+        profiles.homepage FROM users JOIN signatures ON users.id = signatures.user_id 
+        JOIN profiles ON profiles.user_id = signatures.user_id;`;
     // NB! remember to RETURN the promise!
     return db
         .query(sql)
@@ -24,6 +26,22 @@ module.exports.getAllSignatures = function () {
             console.log("error in getAllSignatures function", error);
         });
 };
+
+
+module.exports.getAllSignaturesByCity = (city) => {
+    const sql = `SELECT users.first_name, users.last_name, profiles.age, profiles.city, 
+        profiles.homepage FROM users JOIN signatures ON users.id = signatures.user_id 
+        JOIN profiles ON profiles.user_id = signatures.user_id WHERE profiles.city = $1;`;
+    return db
+        .query(sql, [city])
+        .then((result) => {
+            return result.rows;
+        })
+        .catch((error) => {
+            console.log("error in getAllSignaturesByCity function", error);
+        });
+};
+
 
 
 module.exports.createSignature = function (user_id, canvassignature) {
@@ -111,14 +129,56 @@ module.exports.insertProfile = function (user_id, age, city, homepage) {
         INSERT INTO profiles (user_id, age, city, homepage)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (user_id)
-        DO UPDATE SET age = $2, city = $3, homepage = $4 
+        DO UPDATE SET age = $2, city = $3, homepage = $4
         RETURNING *;
+    `;
+    return db
+        .query(sql, [user_id, age, city, homepage])
+};
+
+
+module.exports.getUserInfo = (user_id) => {
+    const sql = `SELECT users.first_name, users.last_name, users.email, profiles.age, profiles.city, 
+        profiles.homepage FROM users JOIN profiles ON users.id = profiles.user_id 
+        WHERE users.id = $1;`;
+    return db
+        .query(sql, [user_id])
+};
+
+
+module.exports.updateUserWithoutPassword = function (id, first_name, last_name, email) {
+    const sql = `
+        UPDATE users SET first_name = $2, last_name = $3, email = $4
+        WHERE id = $1;
     `;
     // Here we are using SAFE interpolation to protect against SQL injection attacks
     return db
-        .query(sql, [user_id, age, city, homepage])
-        .then((result) => result.rows)
-        .catch((error) => console.log("error in insertProfile function", error));
+        .query(sql, [id, first_name, last_name, email])
+};
+
+
+
+module.exports.updateUserWithPassword = function (
+    id,
+    first_name,
+    last_name,
+    email,
+    password
+) {
+    const sql = `
+        UPDATE users SET first_name = $2, last_name = $3, email = $4, password = $5
+        WHERE id = $1;
+    `;
+    // Here we are using SAFE interpolation to protect against SQL injection attacks
+    return db.query(sql, [id, first_name, last_name, email, password]);
+};
+
+
+
+module.exports.deleteSignature = (user_id) => {
+    const sql = `DELETE FROM signatures WHERE user_id = $1;`;
+    return db.query(sql, [user_id]);
+
 };
 
 // Example of an SQL injection attack!

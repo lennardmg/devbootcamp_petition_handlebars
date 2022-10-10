@@ -2,8 +2,22 @@
 1) adding your signatureId to req.session after signing
 1,5) when signing in, join the users table with signatures table and add both
 
-2) update signature function / show signers etc. (joining the three tables etc.)
+2) check for the right buttons at all the right places
 
-3) show information on signers page
+3) check the logic for accessing pages
 
-4) implement handlebars for the links (city etc.)
+4) nice CSS & Petition meaning
+
+
+?? when the profile page is left, even when the fields are empty the table in the DB should be updated. Doesnt work 
+tho if the age column is INT and is left empty. Had to set it to VARCHAR in order to work ??
+
+?? why does an empty Website entry in DB result into "/" on the profile/edit page ??
+
+?? why does a double firstname/lastname, meaning incl. a space, only show the first part on the profile/edit page? 
+inside the DB table its being shown correctly ??
+
+?? why is the layout not working with my signaturesByCity.handlebars???
+
+?? why does my deleteSignature function not work??
+

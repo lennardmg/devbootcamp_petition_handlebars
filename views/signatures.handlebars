@@ -1,9 +1,15 @@
-<a href="/logOut" style="color:green; float: right">LOG-OUT</a>
+<a href="/logOut" style="color:green; float: right">LOG-OUT</a> <br>
+<a href="/profileEdit" style="color:green; float: right">Edit Profile</a> <br>
 
 <h3> Here are all of the supporters that signed already: </h3>
 
  <ul>
             {{#signatures}}
-            <li> {{ id }} </li>
+                {{#if homepage}}
+            <li> <a href={{ homepage }} target="_blank" rel="noopener noreferrer">{{ first_name }} {{ last_name }}</a> &nbsp;&nbsp;&nbsp;    {{ age }}    &nbsp;&nbsp;&nbsp;  <a href=/signatures/{{ city }} > {{ city }} </a></li>
+            
+                {{else}}
+            <li> {{ first_name }} {{ last_name }} &nbsp;&nbsp;&nbsp; {{ age }} &nbsp;&nbsp;&nbsp; <a href=/signatures/{{ city }}> {{ city }} </a></li>
+                {{/if}}
             {{/signatures}}
         </ul>

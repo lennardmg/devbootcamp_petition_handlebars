@@ -22,7 +22,7 @@ CREATE TABLE signatures (
 CREATE TABLE profiles (
     id SERIAL PRIMARY KEY,
     user_id INT UNIQUE REFERENCES users(id),
-    age INT,
+    age VARCHAR(4),
     city VARCHAR(100),
     homepage VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

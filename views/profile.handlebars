@@ -1,6 +1,6 @@
 <a href="/logOut" style="color:green; float: right">LOG-OUT</a>
 
-<h3> Nice to have you on board {{ name }}, would you like to provide us with some more information about yourself? </h3>
+<h3> Nice to have you on board <strong> {{ name }} </strong>, would you like to provide us with some more information about yourself? </h3>
 
 <form method="POST" id="profile_form">
 
@@ -17,7 +17,8 @@
         <input
             name="city"
             type="text"
-            pattern="[\p{Letter}\-'ßñÄÖÜäüöæÆÅåØø]+"
+            pattern="[A-ZÄÖÜÆÅØ][\p{Letter}\-' ßñäüöæåø]+"
+            title="Has to start with a capital letter, no numbers allowed."
             class="user-data"
             id="city"
             placeholder="Your city"
@@ -38,4 +39,5 @@
 
     </form>
 
-    <h4> If you want to keep that to yourself, no problem, go directly to <a href="/main">SIGN</a> our petition.</h4>
+    <h4> If you want to keep that to yourself, no problem, this information is not mandatory. <br> Just leave the fields empty and click
+    on the Edit Info button to continue. You can still edit your profile later on. </h4>

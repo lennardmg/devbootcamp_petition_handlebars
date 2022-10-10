@@ -1,0 +1,88 @@
+<a href="/logOut" style="color:green; float: right">LOG-OUT</a>
+
+<h3> Hey <strong> {{ name }} </strong>, would you like to update your information? </h3>
+
+<form method="POST" id="updateProfile_form">
+
+        <p>Your first name</p>
+        <input
+            name="firstname"
+            type="text"
+            pattern="[\p{Letter}\-' ßñÄÖÜäüöæÆÅåØø]+"
+            title="No numbers allowed."
+            class="user-data"
+            id="firstname"
+            value= {{ firstname }}
+        /> <span class="error"><p id="firstname_error"></p></span>
+
+        <p>Your last name</p>
+        <input
+            name="lastname"
+            type="text"
+            pattern="[\p{Letter}\-' ßñÄÖÜäüöæÆÅåØø]+"
+            title="No numbers allowed."
+            class="user-data"
+            id="lastname"
+            value= {{ lastname }}
+        /> <span class="error"><p id="lastname_error"></p></span>
+
+        <p>Your email</p>
+         <input
+            name="email"
+            type="email"
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+            title="Please enter a valid E-Mail address."
+            class="user-data"
+            id="email"
+            value= {{ email }}
+        /> <span class="error"><p id="email_error"></p></span>
+
+        <p>Your password</p>
+        <input
+            name="password"
+            type="password"
+            class="user-data"
+            id="password"
+            placeholder="New Password"
+        /> 
+
+        <p>Your age</p>
+         <input
+            name="age"
+            type="number"
+            min="18" 
+            max="99"
+            class="user-data"
+            id="age"
+            value= {{ age }}
+        />
+
+        <p>Your city</p>
+        <input
+            name="city"
+            type="text"
+            pattern="[A-ZÄÖÜÆÅØ][\p{Letter}\-' ßñäüöæåø]+"
+            title="Has to start with a capital letter, no numbers allowed."
+            class="user-data"
+            id="city"
+            value= {{ city }}
+        />
+
+        <p>Your homepage</p>
+        <input
+            name="homepage"
+            type="url"
+            class="user-data"
+            id="homepage"
+            value= {{ homepage }}
+        />
+        
+
+        <input type="submit" value="Update Profile" />
+
+        <p style="color:red" > {{ error }} </p>
+
+    </form>
+
+
+<script src="./profileEdit.js"></script>
