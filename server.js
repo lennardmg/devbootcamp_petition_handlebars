@@ -13,6 +13,10 @@ const { deleteSignature } = require("./db");
 const { updateUserWithoutPassword } = require("./db");
 const { updateUserWithPassword } = require("./db");
 const { checkForSignature } = require("./db");
+const { checkIfEmailExists } = require("./db");
+
+// imported function to check if a user is logged-in
+const { requireLoggedInUser } = require("./db");
 
 const chalk = require("chalk");
 const path = require("path");
@@ -32,15 +36,15 @@ const { engine } = require("express-handlebars");
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 
+/// to be able to insert a global error: ///
+let globalError = "";
+
+
 /////////////////////////////////// setting the static folder /////////////////////////
 app.use(express.static(path.join(__dirname, "public")));
 
 ////////////////////////////////// MIDDLEWARES /////////////////////////////////////
-app.use(
-    express.urlencoded({
-        extended: false,
-    })
-);
+app.use(express.urlencoded({extended: false}));
 
 // app.use(cookieParser());
 // to activate the cookie session: the string in "secret" could be anything, its kind of like a password
@@ -59,15 +63,28 @@ app.use(
 app.get("/petition", (req, res) => {
     // to see the content of the signatures table in the petition database:
     // getAllSignatures().then((result) => console.log(result));
+    console.log("req.query to string in get /petition: ", req.query.deleted);
 
-    if (req.session.userId && req.session.signed == false) {
-        res.render("petition", {
-            title: "Sign Here",
-        });
+    if (req.session.userId) {
+
+        // in the case, that the signature just got deleted:
+        if (req.query.deleted == "true" && req.session.signed == false) {
+            res.render("petition", {
+                title: "Sign Here",
+                message: "*Your signature got successfully deleted.",
+            });
+        } else if (req.session.signed == false) {
+            res.render("petition", {
+                title: "Sign Here",
+            });
+        }
+
     } else {
-        res.redirect("/thankyou");
+        res.redirect("/registration");
     }
 });
+
+
 
 app.post("/petition", (req, res) => {
     // console.log("this is the request body: ", req.body);
@@ -88,6 +105,8 @@ app.post("/petition", (req, res) => {
 
 
 });
+
+
 
 app.get("/thankyou", (req, res) => {
     
@@ -112,6 +131,8 @@ app.get("/thankyou", (req, res) => {
             console.log("error in GET request from /thankyou", err);
         });
 });
+
+
 
 app.get("/signatures", (req, res) => {
 
@@ -243,6 +264,7 @@ app.post("/logIn", (req, res) => {
                     // console.log(req.session);
                     res.redirect("/petition");
                 } else {
+
                     req.session.signed = false;
                     // console.log(req.session);
                     res.redirect("/petition");
@@ -338,6 +360,7 @@ app.get("/profileEdit", (req, res) => {
             firstname: userData.rows[0].first_name,
             lastname: userData.rows[0].last_name,
             email: userData.rows[0].email,
+            emailError: globalError,
             age: userData.rows[0].age,
             city: userData.rows[0].city,
             homepage: userData.rows[0].homepage,
@@ -380,10 +403,13 @@ app.post("/profileEdit", (req, res) => {
                         updateUserWithoutPassword(req.session.userId, firstname, lastname, email)
                     ])
                     .then(() => {
+                        globalError = "";
                         res.redirect("/petition");
                     })
                     .catch((err) => {
                         console.log("error in updateUserWithoutPassword at post /profileEdit: ", err);
+                        globalError = err.detail;
+                        res.redirect("/profileEdit");
                     });
 
                     //// when the user DOES change his/her password
@@ -420,27 +446,22 @@ app.post("/profileEdit", (req, res) => {
                                           ),
                                       ])
                                           .then(() => {
+                                            globalError = "";
                                               res.redirect("/petition");
                                           })
                                           .catch((err) => {
-                                              console.log(
-                                                  "error in updateUserWithPassword at post /profileEdit: ",
-                                                  err
-                                              );
+                                              console.log("error in updateUserWithPassword at post /profileEdit: ", err);
+                                              globalError = err.detail;
+                                              res.redirect("/profileEdit");
                                           });
 
                             })
                             .catch((err) => {
-                                console.log(
-                                    "error in hashing function inside POST request from /profileEdit ",
-                                    err
-                                );
+                                console.log("error in hashing function inside POST request from /profileEdit ", err);
                             });
                     }
-
                     hashing();
                 }
-
                 ////////////////////////////////////////////
             } else {
                       res.redirect("/registration");
@@ -451,26 +472,22 @@ app.post("/profileEdit", (req, res) => {
 
 app.post("/petition/delete", (req, res) => {
 
-    if (req.session.userId) {
-        
-        deleteSignature(req.session.userId && req.session.signed == true)
+  
+        deleteSignature(req.session.userId)
             .then(() => {
-                res.redirect("/petition", {
-                    title: "Sign here",
-                    message: "Your signature got successfully deleted."
-                });
+
+                // I have to define a particular route with a query, otherwise I'd be redirected to /petition/delete
+                req.session.signed = false;
+                res.redirect(
+                    "/petition?deleted=true");
             })
             .catch((err) => {
-                console.log("error in deleteSignature in post /petition/delete: ", err);
-                res.redirect("/petition", {
-                    title: "Sign here",
-                    message: "Nothing to delete. Please sign and support us!",
-                });
+                console.log(
+                    "error in deleteSignature in post /petition/delete: ",
+                    err
+                );
             });
-
-    } else {
-        res.redirect("/registration");
-    }
+  
 });
 
 ///////////////////// MAKE THE SERVER LISTEN ////////////////////////

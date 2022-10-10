@@ -1,8 +1,8 @@
-    <a href="/logOut" style="color:green; float: right">LOG-OUT</a>
+    <a href="/logOut" style="color:green; float: right">LOG-OUT</a> <br>
+    <a href="/profileEdit" style="color:green; float: right">Edit Profile</a> <br>
     
 <div>
 
-    <p style="color:green" > {{ message }} </p>
 
     <form method="POST" id="petition_form">
         
@@ -15,8 +15,11 @@
             width="420" 
             height="150"
         > Here, the signature Canvas should be shown. </canvas> 
-        <a href="#" class="button" onclick="clearSignature()">Remove Signature</a>
+        <a href="#" class="button" onclick="clearSignature()">Shaky hand? Delete and try again.</a>
         <span class="error"><p id="signature_error"></p></span>
+
+         <h4 style="color:green" > {{ message }} </h4>
+
         <input type="submit" value="Submit your vote" />
 
         <input name="savedSignature" id="savedSignature" type="hidden"/>

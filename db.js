@@ -196,5 +196,17 @@ module.exports.checkForSignature = (user_id) => {
 };
 
 
+module.exports.checkIfEmailExists = (email) => {
+    const sql = ` SELECT
+      CASE WHEN EXISTS 
+      (
+            SELECT email FROM users WHERE email = $1
+      )
+      THEN 'true'
+      ELSE 'false'
+   END;`;
+    return db.query(sql, [email]);
+};
+
 // Example of an SQL injection attack!
 // createCity("Berlin'; DROP TABLE users;")
