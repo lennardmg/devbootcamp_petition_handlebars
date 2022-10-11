@@ -1,13 +1,25 @@
-body{
- background-color: antiquewhite;
+* {
+    box-sizing: border-box;
 }
 
-h1 {
-    text-align: center;
+body, html {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 0;
+    background-image: url('./shutterstock_1387475042-1.jpg');
+    min-height: 100vh;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size:cover;
 }
 
-h2, h3, h4 {
+h1, h2, h3, h4 {
     text-align: center;
+    color: white;
+}
+
+a {
+    color: blue;
 }
 
 ul {
@@ -22,6 +34,7 @@ li {
 form {
     max-width: 420px;
     margin: 50px auto;
+    color: white;
 }
 
 .error {
@@ -30,13 +43,12 @@ form {
 }
 
 .user-data {
-    color: black;
-    font-family: Helvetica, Arial, sans-serif;
+    color: white;
     font-weight: 500;
     font-size: 18px;
     border-radius: 5px;
     line-height: 22px;
-    background-color: transparent;
+    background: rgba(0, 0, 0, 0.5);
     border: 2px solid #cc6666;
     transition: all 0.3s;
     padding: 13px;
@@ -52,12 +64,12 @@ form {
 
 canvas {
     border: 2px dotted #cc6666 !important;
+    background: rgba(151, 111, 52, 0.8) !important;
     resize: vertical;
     cursor: url(https://icons.iconarchive.com/icons/awicons/vista-artistic/48/edit-icon.png) 0 38, crosshair;
 }
 
-[type="submit"] {
-    font-family: "Montserrat", Arial, Helvetica, sans-serif;
+.submitMain {
     width: 100%;
     background: #cc6666;
     border-radius: 5px;
@@ -71,9 +83,53 @@ canvas {
     margin-top: -4px;
     font-weight: 700;
 }
+
+.submitType2 {
+    min-width: 120px;
+    background: #66c0cc;
+    border-radius: 5px;
+    border: 0;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    transition: all 0.5s;
+    font-weight: 600;
+}
+
+.buttonContainer {
+    display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+    height: 50px;
+    width: 400px;
+}
+
+.outterButtonContainer {
+    display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
 [type="submit"]:hover {
     background: #8F7CEC;
     color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 10px #8F7CEC, 0 0 25px #8F7CEC, 0 0 50px #8F7CEC, 0 0 100px #8F7CEC;
+}
+
+.listOfSigners {
+    border-radius: 10px;
+    width: 60%;
+    margin-left: 20%;
+    background: rgb(0 88 87 / 50%);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+footer {
+    height: 50px;
+    color: white;
 }

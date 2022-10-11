@@ -63,7 +63,7 @@ app.use(
 app.get("/petition", (req, res) => {
     // to see the content of the signatures table in the petition database:
     // getAllSignatures().then((result) => console.log(result));
-    console.log("req.query to string in get /petition: ", req.query.deleted);
+    // console.log("req.query to string in get /petition: ", req.query.deleted);
 
     if (req.session.userId) {
 
@@ -77,6 +77,8 @@ app.get("/petition", (req, res) => {
             res.render("petition", {
                 title: "Sign Here",
             });
+        } else if (req.session.signed == true) {
+            res.redirect("/thankyou")
         }
 
     } else {
@@ -114,7 +116,7 @@ app.get("/thankyou", (req, res) => {
     Promise.all([countSignatures(), showLastSigner(req.session.userId)])
 
         .then((result) => {
-            console.log("results in count signatures: ", result);
+            // console.log("results in count signatures: ", result);
 
             if (req.session.userId && req.session.signed == true) {
                 res.render("thankyou", {
@@ -138,7 +140,7 @@ app.get("/signatures", (req, res) => {
 
     getAllSignatures().then((result) => {
 
-        console.log("results in getAllSignatures: ", result);
+        // console.log("results in getAllSignatures: ", result);
 
         if (req.session.userId && req.session.signed == true) {
             res.render("signatures", {
@@ -195,7 +197,7 @@ app.post("/registration", (req, res) => {
                 // now all of the user data + the hashed password is going to get inserted in the users table
                 insertUser(firstname, lastname, email, hashedPassword)
                     .then((data) => {
-                        console.log("data in Post registration: ", data);
+                        // console.log("data in Post registration: ", data);
                         req.session.userId = data[0].id;
                         req.session.userName = data[0].first_name;
                         req.session.signed = false;
@@ -293,7 +295,7 @@ app.get("/logOut", (req, res) => {
 
 app.get("/profile", (req, res) => {
 
-    console.log("my cookie: ", req.session.userId);
+    // console.log("my cookie: ", req.session.userId);
 
   res.render("profile", {
       title: "Your Profile",
@@ -326,6 +328,7 @@ app.post("/profile", (req, res) => {
 app.get("/signatures/:city", (req, res) => {
     
     let city = req.params.city;
+    // console.log(req.params);
 
     getAllSignaturesByCity(city)
         .then((result) => {

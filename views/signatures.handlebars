@@ -1,19 +1,30 @@
-<a href="/logOut" style="color:green; float: right">LOG-OUT</a> <br>
-<a href="/profileEdit" style="color:green; float: right">Edit Profile</a> <br>
 
 <h3> Here are all of the supporters that signed already: </h3>
 
- <ul>
+ <ul class="listOfSigners">
             {{#signatures}}
                 {{#if homepage}}
-            <li> <a href={{ homepage }} target="_blank" rel="noopener noreferrer">{{ first_name }} {{ last_name }}</a> &nbsp;&nbsp;&nbsp;    {{ age }}    &nbsp;&nbsp;&nbsp;  <a href=/signatures/{{ city }} > {{ city }} </a></li>
+            <li> <a href={{ homepage }} target="_blank" rel="noopener noreferrer">{{ first_name }} {{ last_name }}</a> &nbsp;&nbsp;&nbsp;    {{ age }}    &nbsp;&nbsp;&nbsp; 🏠 <a href=/signatures/{{ city }} >  {{ city }} </a></li>
             
                 {{else}}
-            <li> {{ first_name }} {{ last_name }} &nbsp;&nbsp;&nbsp; {{ age }} &nbsp;&nbsp;&nbsp; <a href=/signatures/{{ city }}> {{ city }} </a></li>
+            <li> {{ first_name }} {{ last_name }} &nbsp;&nbsp;&nbsp; {{ age }} &nbsp;&nbsp;&nbsp; 🏠<a href=/signatures/{{ city }}>  {{ city }} </a></li>
                 {{/if}}
             {{/signatures}}
         </ul>
 
-<form action="/petition/delete" method="post">
-    <input type="submit" class="button-action" value="❌ Delete signature">
+
+<div class="outterButtonContainer">
+<div class="buttonContainer">
+<form action="/profileEdit">
+        <input class="submitType2" type="submit" class="button-action" value="👨‍💻 Edit Profile">
 </form>
+
+<form action="/petition/delete" method="post">
+    <input class="submitType2" type="submit" class="button-action" value="❌ Delete signature">
+</form>
+
+<form action="/logOut">
+        <input class="submitType2" type="submit" class="button-action" value="👋 Log-out">
+</form>
+</div>
+</div>

@@ -1,15 +1,28 @@
-<a href="/logOut" style="color:green; float: right">LOG-OUT</a> <br>
-<a href="/profileEdit" style="color:green; float: right">Edit Profile</a> <br>
+<h4> Thanks <strong> {{ name }} </strong> for voting and supporting the fight against plastic pollution. <br>
+Check out <a href="https://www.greenpeace.org.uk/news/9-ways-reduce-plastic-use/">Greenpeace.org</a>to see what 
+everyone of us can individually do to further tackle the issue. <br> Spread awereness! </h4>
 
-<h4> Thanks <strong> {{ name }} </strong> for voting Lennard for president! I promise to make your vote count!! Peace Out </h4>
+<h3> <img src={{ lastPersonWhoSigned }} alt="signature" style="border:black solid 1px; background: rgba(151, 111, 52, 0.8); border-radius: 5px;"> </h3>
 
-<h3> <img src={{ lastPersonWhoSigned }} alt="signature" style="border:black solid 1px"> </h3>
+<h4> <p> So far, {{ signatures }} people have voted! </p> </h4>
 
-<h4> <p> so far, {{ signatures }} people have voted! </p> </h4>
+<h4> <a href="/signatures"> ➡️ See who signed already </a> </h4>
 
-<h4> <a href="/signatures"> See who signed already </a> </h4>
 
+<div class="outterButtonContainer">
+<div class="buttonContainer">
+<form action="/profileEdit">
+        <input class="submitType2" type="submit" class="button-action" value="👨‍💻 Edit Profile">
+</form>
 
 <form action="/petition/delete" method="post">
-    <input type="submit" class="button-action" value="❌ Delete signature">
+    <input class="submitType2" type="submit" class="button-action" value="❌ Delete signature">
 </form>
+
+<form action="/logOut">
+        <input class="submitType2" type="submit" class="button-action" value="👋 Log-out">
+</form>
+</div>
+</div>
+
+
