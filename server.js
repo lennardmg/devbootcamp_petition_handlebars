@@ -493,6 +493,14 @@ app.post("/petition/delete", (req, res) => {
   
 });
 
+
+app.get("/about", (req, res) => {
+    res.render("about", {
+        title: "About our cause ...",
+    });
+});
+
+
 ///////////////////// MAKE THE SERVER LISTEN ////////////////////////
 app.listen(PORT, () =>
     console.log(`Petition project running, listening on port: ${PORT}`)

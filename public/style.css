@@ -19,7 +19,7 @@ h1, h2, h3, h4 {
 }
 
 a {
-    color: blue;
+    color: lightgreen;
 }
 
 ul {
@@ -127,6 +127,11 @@ canvas {
     margin-left: 20%;
     background: rgb(0 88 87 / 50%);
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.aboutInfo {
+    color: white;
+    
 }
 
 footer {

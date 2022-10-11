@@ -1,12 +1,13 @@
-    <a href="/logOut" style="color:green; float: right">LOG-OUT</a> <br>
-    <a href="/profileEdit" style="color:green; float: right">Edit Profile</a> <br>
-    
+
 <div>
 
+   <h3> <a href="/about"> About our cause ... </a> </h3>
 
     <form method="POST" id="petition_form">
         
-    <h3> Please sign here to support us in our fight against plastic pollution: </h3>
+    <h3> Please sign here to support us in our fight against plastic pollution: <br>
+    We demand that politics creates incentives for plastic saving and that plastic producers have to pay <br>  
+    for a mandatory recycling process and for cleanups.</h3>
         <canvas
             name="signature"
             class="user-data"
@@ -15,17 +16,31 @@
             width="420" 
             height="150"
         > Here, the signature Canvas should be shown. </canvas> 
-        <a href="#" class="button" onclick="clearSignature()">Shaky hand? Delete and try again.</a>
+        <a href="#" class="button" onclick="clearSignature()" style="color:blue">Shaky hand? Delete and try again.</a>
         <span class="error"><p id="signature_error"></p></span>
 
-         <h4 style="color:green" > {{ message }} </h4>
+         <h4 style="color:lightgreen" > {{ message }} </h4>
 
-        <input type="submit" value="Submit your vote" />
+        <input class="submitMain" type="submit" value="Submit your vote" />
 
         <input name="savedSignature" id="savedSignature" type="hidden"/>
 
         
     </form>
+
+
+<div class="outterButtonContainer">
+<div class="buttonContainer">
+<form action="/profileEdit">
+        <input class="submitType2" type="submit" class="button-action" value="👨‍💻 Edit Profile">
+</form>
+
+<form action="/logOut">
+        <input class="submitType2" type="submit" class="button-action" value="👋 Log-out">
+</form>
+</div>
+</div>
+
 
 
 </div>
