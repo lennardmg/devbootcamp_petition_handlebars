@@ -126,7 +126,7 @@ app.get("/thankyou", (req, res) => {
                     lastPersonWhoSigned: result[1][0].canvassignature,
                 });
             } else {
-                res.redirect("/registration");
+                res.redirect("/petition");
             }
         })
         .catch((err) => {
