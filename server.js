@@ -60,6 +60,12 @@ app.use(
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+
+app.get("/", (req, res) => {
+    res.redirect("/petition");
+});
+
+
 app.get("/petition", (req, res) => {
     // to see the content of the signatures table in the petition database:
     // getAllSignatures().then((result) => console.log(result));
